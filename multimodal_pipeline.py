@@ -15,9 +15,7 @@ def run_multimodal_tactical_assistant():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # ---------------------------------------------------------
-    # PHASE 1: THE SPATIAL GRAPH ENGINE (ST-GNN)
-    # ---------------------------------------------------------
+ 
     print("1. Waking up Spatial Graph Engine (ST-GNN)...")
     stgnn = TacticalSTGNN(num_node_features=8, hidden_channels=64, rnn_hidden=128)
     stgnn.load_state_dict(torch.load("best_tactical_stgnn.pt", map_location=device, weights_only=True))
@@ -50,12 +48,10 @@ def run_multimodal_tactical_assistant():
 
     print(f"   -> Tactical Anomaly Detected! (Predicted xT Shift: {highest_threat:+.4f})")
 
-    # ---------------------------------------------------------
-    # PHASE 2: THE TRANSLATION LAYER (TENSORS TO JSON)
-    # ---------------------------------------------------------
+
     print("3. Converting geometric tensors into structured JSON format...")
 
-    # Dynamically construct the JSON prompt based on the ST-GNN's threat prediction.
+
     zone_focus = "Central Channel Penetration" if highest_threat > 0.0015 else "Half-Space Overload"
 
     gnn_context = {
@@ -73,12 +69,10 @@ def run_multimodal_tactical_assistant():
 
     json_input = json.dumps(gnn_context)
 
-    # ---------------------------------------------------------
-    # PHASE 3: THE LANGUAGE ENGINE (LORA GEMMA-2B)
-    # ---------------------------------------------------------
+
     print("4. Authenticating local machine with Hugging Face...")
 
-    # --- INSERT YOUR HUGGING FACE TOKEN HERE ---
+
     login("your_hf_token_here")
 
     print("5. Loading 4-Bit LLM Coaching Brain into local VRAM...")
@@ -93,7 +87,7 @@ def run_multimodal_tactical_assistant():
     base_model_name = "google/gemma-2b-it"
     adapter_path = "./gemma-tactical-translator-final"
 
-    # Load base model
+
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_name,
         quantization_config=bnb_config,
@@ -101,7 +95,7 @@ def run_multimodal_tactical_assistant():
     )
     tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
-    # Inject your fine-tuned LoRA weights downloaded from Colab
+
     model = PeftModel.from_pretrained(base_model, adapter_path)
 
     print("6. Generating Expert Coaching Directive...\n")
@@ -114,7 +108,7 @@ def run_multimodal_tactical_assistant():
     outputs = model.generate(
         **inputs,
         max_new_tokens=150,
-        temperature=0.3,  # Low temperature for analytical, consistent advice
+        temperature=0.3, 
         do_sample=True,
         pad_token_id=tokenizer.eos_token_id
     )
@@ -123,7 +117,7 @@ def run_multimodal_tactical_assistant():
     final_directive = response.split("model\n")[-1].strip()
 
     print("============================================================")
-    print("🎙️ AI ASSISTANT MANAGER DIRECTIVE")
+    print(" AI ASSISTANT MANAGER DIRECTIVE")
     print("============================================================")
     print(final_directive)
     print("============================================================\n")

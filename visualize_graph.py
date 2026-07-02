@@ -28,7 +28,6 @@ def visualize_top_sequence():
     highest_threat_magnitude = -1.0
     best_prediction = 0.0
 
-    # Scan the dataset to find the most extreme prediction (positive or negative)
     with torch.no_grad():
         for batch_seq in val_loader:
             gat_embeddings = []
@@ -54,10 +53,8 @@ def visualize_top_sequence():
     print(f"\n3. Top Sequence Found! AI Predicted xT: {best_prediction:+.5f}")
     print("   -> Rendering Tactical Pitch...")
 
-    # Extract the FINAL frame of the top sequence for visualization
     final_frame = best_sequence[-1].cpu()
 
-    # Un-normalize features
     # Feature map: [0:x, 1:y, 2:is_team, 3:pos, 4:is_carrier, 5:press, 6:dist_to_goal, 7:angle]
     x_coords = final_frame.x[:, 0].numpy() * 120.0
     y_coords = final_frame.x[:, 1].numpy() * 80.0
@@ -66,33 +63,32 @@ def visualize_top_sequence():
     edges = final_frame.edge_index.numpy()
     true_xt = final_frame.y.item()
 
-    # Draw StatsBomb Pitch
+
     pitch = Pitch(pitch_type='statsbomb', pitch_color='#1a2421', line_color='#c7d5cc')
     fig, ax = pitch.draw(figsize=(10, 7))
     fig.set_facecolor('#1a2421')
 
-    # Draw Masked Attention Edges
+
     for i in range(edges.shape[1]):
         src, dst = edges[0, i], edges[1, i]
         pitch.lines(x_coords[src], y_coords[src], x_coords[dst], y_coords[dst],
                     ax=ax, color='white', alpha=0.3, zorder=1)
 
-    # Plot Defending Team
+
     opp_mask = (teammates == 0.0)
     pitch.scatter(x_coords[opp_mask], y_coords[opp_mask], ax=ax, c='#1e90ff',
                   s=150, edgecolors='black', linewidth=2, zorder=2, label="Defending Team")
 
-    # Plot Attacking Team
     team_mask = (teammates == 1.0) & (is_carrier == 0.0)
     pitch.scatter(x_coords[team_mask], y_coords[team_mask], ax=ax, c='#ea6969',
                   s=150, edgecolors='black', linewidth=2, zorder=2, label="Attacking Team")
 
-    # Plot Ball Carrier (Gold)
+
     carrier_mask = (is_carrier == 1.0)
     pitch.scatter(x_coords[carrier_mask], y_coords[carrier_mask], ax=ax, c='#ffd700',
                   s=250, edgecolors='black', linewidth=2, zorder=3, label="Ball Carrier", marker='*')
 
-    # Formatting
+
     plt.title(f"ST-GNN Memory Frame | Predicted xT: {best_prediction:+.4f} | True xT: {true_xt:+.4f}",
               color='white', fontsize=14)
     legend = ax.legend(loc='upper left', facecolor='#1a2421', edgecolor='white')

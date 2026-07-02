@@ -33,7 +33,7 @@ def run_temporal_inference():
         for i, batch_seq in enumerate(val_loader):
             gat_embeddings = []
 
-            # Process Spatial Frames
+
             for t_step in batch_seq:
                 t_step = t_step.to(device)
                 x = torch.nn.functional.relu(model.gat1(t_step.x, t_step.edge_index, t_step.edge_attr))
@@ -49,34 +49,34 @@ def run_temporal_inference():
             true_xt = batch_seq[-1].y.item()
             predicted_xt = prediction.item()
 
-            # Save every sequence to our scouting list
+    
             scout_reports.append({
                 "id": i + 1,
                 "true_xt": true_xt,
                 "predicted_xt": predicted_xt
             })
 
-    # Sort the reports by the absolute value of the predicted threat (Highest to Lowest)
+  
     scout_reports.sort(key=lambda x: abs(x["predicted_xt"]), reverse=True)
 
     print("=" * 60)
-    print(f"📊 AI SCOUTING REPORT: TOP 5 HIGHEST THREAT SEQUENCES")
+    print(f" AI SCOUTING REPORT: TOP 5 HIGHEST THREAT SEQUENCES")
     print("=" * 60)
     print(f"Total sequences analyzed: {len(scout_reports)}\n")
 
-    # Print the Top 5 most extreme predictions
+
     for rank, report in enumerate(scout_reports[:5]):
         print(f"RANK #{rank + 1} | Chronological Sequence #{report['id']}")
         print(f"Final Frame True xT:      {report['true_xt']:+.6f}")
         print(f"AI Predicted Future xT:   {report['predicted_xt']:+.6f}")
 
-        # Dynamic Assessment based on the new scale
+ 
         if report['predicted_xt'] > 0.001:
-            print("🧠 ST-GNN Assessment: POSITIVE FORWARD MOMENTUM")
+            print(" ST-GNN Assessment: POSITIVE FORWARD MOMENTUM")
         elif report['predicted_xt'] < -0.001:
-            print("🧠 ST-GNN Assessment: NEGATIVE MOMENTUM / TURNOVER RISK")
+            print(" ST-GNN Assessment: NEGATIVE MOMENTUM / TURNOVER RISK")
         else:
-            print("🧠 ST-GNN Assessment: MINOR POSSESSION SHIFT")
+            print(" ST-GNN Assessment: MINOR POSSESSION SHIFT")
         print("-" * 60)
 
 

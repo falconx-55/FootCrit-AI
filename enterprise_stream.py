@@ -13,7 +13,7 @@ class StreamingStatsBombDataset(IterableDataset):
     def __init__(self, s3_folder, split="train", val_ratio=0.2, seq_len=3):
         super().__init__()
         self.s3 = s3fs.S3FileSystem(anon=False)
-        self.seq_len = seq_len  # Number of chronological events to pass at once
+        self.seq_len = seq_len  
 
         s3_path = s3_folder.replace("s3://", "").rstrip("/")
         raw_files = self.s3.find(s3_path)
@@ -34,13 +34,12 @@ class StreamingStatsBombDataset(IterableDataset):
         players = group.to_dict('records')
 
         for row in players:
-            # NORMALIZATION: Squash coordinates between 0 and 1
+     
             x = row['location'][0] / 120.0
             y = row['location'][1] / 80.0
 
             is_teammate = 1.0 if row['teammate'] else 0.0
 
-            # Position IDs range up to ~25, so divide by 25
             raw_pos = float(row.get('position.id', 0.0)) if pd.notna(row.get('position.id')) else 0.0
             pos_id = raw_pos / 25.0
 
@@ -52,18 +51,15 @@ class StreamingStatsBombDataset(IterableDataset):
                     ox = other['location'][0] / 120.0
                     oy = other['location'][1] / 80.0
                     dist = math.hypot(x - ox, y - oy)
-                    # 5 yards is roughly 0.04 in our normalized 0-1 pitch scale
+                  
                     if dist < 0.04:
                         pressure += 1.0
 
-            # Pressure maxes out around 5 players, squash to 0-1
             pressure_norm = min(pressure / 5.0, 1.0)
 
-            # Normalize distance to goal (max distance is ~140 yards)
             raw_dist_to_goal = math.hypot(120 - row['location'][0], 40 - row['location'][1])
             dist_to_goal = raw_dist_to_goal / 140.0
 
-            # Angle is naturally between -pi and pi, so we leave it alone or divide by pi
             angle_to_goal = math.atan2(40 - row['location'][1], 120 - row['location'][0]) / math.pi
 
             node_features.append([
@@ -79,7 +75,6 @@ class StreamingStatsBombDataset(IterableDataset):
         edge_attrs = []
         valid_edge_indices = []
 
-        # MASKED ATTENTION: Only connect players within 25 yards
         for src, dst in edge_indices:
             dist = math.hypot(node_features[src][0] - node_features[dst][0],
                               node_features[src][1] - node_features[dst][1])
@@ -118,20 +113,14 @@ class StreamingStatsBombDataset(IterableDataset):
                 if graph is not None:
                     graph_sequence.append(graph)
 
-            # 4. Only yield if all 3 frames successfully built a graph
             if len(graph_sequence) == self.seq_len:
 
-                # --- DATA BALANCING (UNDERSAMPLING THE MAJORITY CLASS) ---
-                # Check the true xT target of the final frame
                 final_target = graph_sequence[-1].y.item()
 
-                # If the pass is "boring" (between -0.01 and 0.01)
                 if -0.01 < final_target < 0.01:
-                    # 85% of the time, we drop it so the AI isn't overwhelmed by midfield passes
                     if random.random() < 0.85:
                         continue
 
-                        # If it's a dangerous attack, a severe turnover, or the 15% of surviving boring passes:
                 yield graph_sequence
 
     def __iter__(self):

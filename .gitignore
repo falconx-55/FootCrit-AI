@@ -1,0 +1,20 @@
+# Environments
+.env
+venv/
+__pycache__/
+
+# AI Model Weights & Adapters (CRITICAL to ignore)
+*.pt
+*.pth
+*.safetensors
+gemma-tactical-translator-final/
+gemma-tactical-translator-final.zip
+
+# Datasets
+*.jsonl
+*.parquet
+*.csv
+
+# IDEs
+.idea/
+.vscode/

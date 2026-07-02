@@ -12,20 +12,19 @@ def generate_synthetic_tactical_dataset(num_samples=500, output_file="tactical_s
 
     dataset = []
 
-    # Vocabulary arrays to generate diverse, realistic tactical scenarios
     zones = ["Zone 14", "Right Half-Space", "Left Flank", "Central Channel Penetration", "Defensive Third"]
     playmakers = ["Player A", "Player B", "Player C", "Player D"]
     formations = ["4-3-3", "4-2-3-1", "3-5-2", "4-4-2 Low Block"]
 
     for i in range(num_samples):
-        # 1. Simulate the mathematical output from our ST-GNN
+ 
         vulnerability = random.choice(zones)
         attention_score = round(random.uniform(0.75, 0.98), 2)
         eigen_centrality = round(random.uniform(0.30, 0.65), 2)
         target_playmaker = random.choice(playmakers)
         opp_formation = random.choice(formations)
 
-        # 2. Construct the strict JSON prompt schema required by the blueprint
+  
         gnn_input_context = {
             "match_context": {
                 "time": f"{random.randint(10, 85)}:00",
@@ -39,7 +38,7 @@ def generate_synthetic_tactical_dataset(num_samples=500, output_file="tactical_s
             }
         }
 
-        # 3. Formulate the Expert Coaching Prose (The Target Output)
+
         if "Flank" in vulnerability or "Half-Space" in vulnerability:
             adjustment = "Shift to an asymmetric defensive block."
             trigger = f"Drop the winger into a deeper position to eliminate the spatial overload detected in the {vulnerability}."
@@ -54,7 +53,7 @@ def generate_synthetic_tactical_dataset(num_samples=500, output_file="tactical_s
             f"Recommendation: {adjustment} {trigger}"
         )
 
-        # 4. Compile the Instruction-Input-Output format for LLM LoRA Fine-tuning
+   
         sft_row = {
             "instruction": "Analyze the provided Graph Neural Network spatial metrics and recommend a formation adjustment and pressing trigger to mitigate the opponent's attacking threat.",
             "input": json.dumps(gnn_input_context),
@@ -63,7 +62,8 @@ def generate_synthetic_tactical_dataset(num_samples=500, output_file="tactical_s
 
         dataset.append(sft_row)
 
-    # 5. Write to JSONL format (Standard for HuggingFace Datasets)
+
+    
     with open(output_file, 'w') as f:
         for entry in dataset:
             f.write(json.dumps(entry) + '\n')

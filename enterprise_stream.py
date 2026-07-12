@@ -136,7 +136,7 @@ def create_streaming_dataloader(s3_folder, batch_size=32, split="train", seq_len
 
 
 if __name__ == "__main__":
-    s3_root_url = "s3://your-bucket-name/events/"
+    s3_root_url = "s3://sports-ai-datalake-emon/events/"
     dataloader = create_streaming_dataloader(s3_folder=s3_root_url, batch_size=2, split="train")
 
     for batch_seq in dataloader:

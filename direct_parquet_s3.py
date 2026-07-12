@@ -6,7 +6,7 @@ import boto3
 from statsbombpy import sb
 
 s3_client = boto3.client('s3')
-BUCKET_NAME = "your-bucket-name"
+BUCKET_NAME = "sports-ai-datalake-emon"
 
 
 def process_and_upload(comp_id, season_id):
@@ -61,4 +61,4 @@ def process_and_upload(comp_id, season_id):
 
 
 if __name__ == "__main__":
-    process_and_upload(comp_id=9, season_id=281)
+    process_and_upload(comp_id=1267, season_id=107)

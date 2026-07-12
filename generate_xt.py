@@ -83,5 +83,5 @@ def update_parquet_with_xt(s3_folder):
 
 
 if __name__ == "__main__":
-    s3_root_url = "s3://your-bucket-name/events/"
+    s3_root_url = "s3://sports-ai-datalake-emon/events/"
     update_parquet_with_xt(s3_root_url)

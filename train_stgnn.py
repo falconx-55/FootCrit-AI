@@ -110,7 +110,7 @@ def train_stgnn(model, train_loader, val_loader, epochs=10, lr=0.0001):
 
 
 if __name__ == "__main__":
-    s3_root_url = "s3://your-bucket-name/events/"
+    s3_root_url = "s3://sports-ai-datalake-emon/events/"
     train_loader = create_streaming_dataloader(s3_folder=s3_root_url, batch_size=32, split="train")
     val_loader = create_streaming_dataloader(s3_folder=s3_root_url, batch_size=32, split="val")
 

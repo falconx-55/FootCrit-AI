@@ -1,0 +1,16 @@
+[server]
+# Default is 200MB -- raise this so full match footage doesn't get rejected
+# mid-upload (which can also present as a dropped connection).
+maxUploadSize = 2000
+
+# Raise the websocket message size limit to be safe with larger payloads.
+maxMessageSize = 500
+
+# Helps some proxy setups (nginx, Streamlit Community Cloud) keep the
+# websocket alive during long blocking computations like video processing.
+enableWebsocketCompression = true
+
+[runner]
+# Avoids Streamlit re-running the whole script unexpectedly while a heavy
+# computation is in flight due to unrelated file-watcher events.
+fastReruns = false

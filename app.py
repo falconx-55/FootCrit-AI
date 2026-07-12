@@ -10,7 +10,7 @@ from data_exporter import TacticalDataExporter
 from graph_builder import TacticalGraphBuilder
 from st_gnn_model import TacticalSTGNN
 
-CLOUD_LLM_API_URL = " your-cloud-url"
+CLOUD_LLM_API_URL = " your-cloud-url-here"
 
 
 def run_tactical_pipeline(video_path, analysis_mode="Full Tactical Breakdown",
